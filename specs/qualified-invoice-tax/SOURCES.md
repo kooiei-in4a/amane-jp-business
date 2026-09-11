@@ -16,7 +16,7 @@
 | S-002 | Normative | 日本国（掲載: e-Gov法令検索） | 消費税法施行令 第70条の10 |
 | S-003 | Interpretive | 国税庁 | 消費税法基本通達 1-8-15 |
 | S-004 | Interpretive | 国税庁 | No.6371 端数計算 |
-| S-005 | Reference | 国税庁 | 適格請求書等保存方式の概要（令和8年4月） |
+| S-005 | Reference | 国税庁 | 適格請求書等保存方式の概要（令和8年5月） |
 | S-006 | Interpretive | 国税庁 | 適格請求書等保存方式に関するQ&A（令和8年5月改訂） |
 | S-007 | Reference | 国税庁 | No.6303 消費税および地方消費税の税率 |
 | S-008 | Reference | 国税庁 | 利用規約・免責事項・著作権 |
@@ -76,11 +76,11 @@
 - Classification: Reference
 - Issuer: 国税庁
 - Title: 適格請求書等保存方式の概要 — インボイス制度の理解のために —
-- URL / document identifier: [令和8年4月PDF](https://www.nta.go.jp/taxes/shiraberu/zeimokubetsu/shohi/keigenzeiritsu/pdf/0020006-027.pdf)
-- Version / publication date: 令和8年4月。PDF表紙で確認した。現行掲載物を2026-09-11にFresh確認した。
+- URL / document identifier: [令和8年5月PDF](https://www.nta.go.jp/taxes/shiraberu/zeimokubetsu/shohi/keigenzeiritsu/pdf/0026004-099-02.pdf)
+- Version / publication date: 令和8年5月。国税庁の現行掲載ページおよびPDF表紙を2026-09-11にFresh確認した。
 - Effective date: PDFは制度開始日を令和5年10月1日として説明している。
 - Relevant section: PDF 7ページ。税抜8%の27,060→2,164、税抜10%の28,158→2,815、明細単位処理の2,163/2,814、税込8%の29,223→2,164、税込10%の30,972→2,815を含む図解と説明。
-- Citation/use condition: Golden Corpusの公式Anchor Caseと、率別集計・明細単位丸め不可の説明に使う。数値は必要最小限の派生データとして記録する。
+- Citation/use condition: Golden Corpusの公式Anchor Caseと、率別集計・明細単位丸め不可の説明に使う。2026-09-11のFresh再確認で、PDF 7ページのアンカー数値が現行版でも同一であることを確認した。数値は必要最小限の派生データとして記録する。
 - Redistribution required?: No. PDF本文や図版を再配布せず、ページ番号と計算結果だけを引用する。
 
 ### S-006 — 適格請求書等保存方式に関するQ&A

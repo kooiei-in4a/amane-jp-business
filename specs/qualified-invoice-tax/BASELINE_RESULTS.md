@@ -78,6 +78,9 @@ Claude Codeの実行中はAgent側のdotnet確認が権限確認で止まった�
 - CI / release / other package: not added
 - `DEVELOPMENT_PRINCIPLES.md`: unchanged
 - `BASELINE_PROTOCOL.md` / `golden/cases.json` / `SOURCES.md`: unchanged
-- Push / PR / merge: not performed
+- At measurement/report creation time:
+  - Push: not performed
+  - PR: not created
+  - Merge: not performed
 
 Coordinatorの採点用実装・HarnessはRepositoryへ追加していない。
