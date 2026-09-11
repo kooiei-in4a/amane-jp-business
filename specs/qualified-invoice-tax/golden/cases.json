@@ -1,0 +1,1182 @@
+{
+  "schemaVersion": "1.0",
+  "corpusKind": "Golden",
+  "lastVerified": "2026-09-11",
+  "ruleSetPolicy": "各ケースは、2023-10-01以後の例示Rule Setを明示する。Categoryと率の永続的同一性は定義しない。",
+  "casePolicy": "全24件は公式アンカーまたは公式式からの派生算術であり、Boundary、Property、Regression専用ケースは含めない。",
+  "roundingPolicy": "1円単位。RoundDownは非負値の切捨て、RoundUpは切上げ、HalfUpは非負値の通常の四捨五入。",
+  "ruleSetExample": {
+    "id": "JP-QIT-2023-10-v1",
+    "effectiveFrom": "2023-10-01",
+    "rateByTaxCategory": [
+      {
+        "taxCategory": "category.general-taxable-transfer",
+        "applicableRate": "0.10"
+      },
+      {
+        "taxCategory": "category.reduced-taxable-transfer",
+        "applicableRate": "0.08"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "caseId": "G-ANCHOR-EX-REDUCED",
+      "provenance": "official-example",
+      "ruleIds": ["QIT-003", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-002", "S-004", "S-005"],
+      "description": "税抜の軽減対象率グループを集計して切捨てる公式アンカー",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-ANCHOR-EX-REDUCED",
+        "basis": "TaxExclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 27060
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 29224,
+        "taxTotalYen": 2164,
+        "breakdown": [
+          {
+            "taxCategory": "category.reduced-taxable-transfer",
+            "applicableRate": "0.08",
+            "basisAmountYen": 27060,
+            "taxYen": 2164
+          }
+        ]
+      },
+      "notes": "NTA概要（S-005）7ページの27,060→2,164。税抜27060×8%=2164.8を切捨てる。"
+    },
+    {
+      "caseId": "G-ANCHOR-EX-GENERAL",
+      "provenance": "official-example",
+      "ruleIds": ["QIT-002", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-002", "S-004", "S-005"],
+      "description": "税抜の一般課税率グループを集計して切捨てる公式アンカー",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-ANCHOR-EX-GENERAL",
+        "basis": "TaxExclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 28158
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 30973,
+        "taxTotalYen": 2815,
+        "breakdown": [
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 28158,
+            "taxYen": 2815
+          }
+        ]
+      },
+      "notes": "NTA概要（S-005）7ページの28,158→2,815。税抜28158×10%=2815.8を切捨てる。"
+    },
+    {
+      "caseId": "G-ANCHOR-EX-MIXED",
+      "provenance": "official-example",
+      "ruleIds": ["QIT-001", "QIT-002", "QIT-003", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-001", "S-002", "S-003", "S-005"],
+      "description": "税抜8%と10%を別々に集計してから計算する公式アンカー",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-ANCHOR-EX-MIXED",
+        "basis": "TaxExclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 27060
+          },
+          {
+            "lineId": "L2",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 28158
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 60197,
+        "taxTotalYen": 4979,
+        "breakdown": [
+          {
+            "taxCategory": "category.reduced-taxable-transfer",
+            "applicableRate": "0.08",
+            "basisAmountYen": 27060,
+            "taxYen": 2164
+          },
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 28158,
+            "taxYen": 2815
+          }
+        ]
+      },
+      "notes": "NTA概要（S-005）7ページの8%対象計と10%対象計を合わせた派生結果。税額は2164+2815、税込請求金額は60197。"
+    },
+    {
+      "caseId": "G-ANCHOR-EX-LINE-ROUNDING",
+      "provenance": "official-example",
+      "ruleIds": ["QIT-001", "QIT-002", "QIT-003", "QIT-006", "QIT-008"],
+      "sourceIds": ["S-003", "S-004", "S-005"],
+      "description": "公式の明細単位丸め誤りを含む税抜ケース",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-ANCHOR-EX-LINE-ROUNDING",
+        "basis": "TaxExclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 13861
+          },
+          {
+            "lineId": "L2",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 13199
+          },
+          {
+            "lineId": "L3",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 4389
+          },
+          {
+            "lineId": "L4",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 23769
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 60197,
+        "taxTotalYen": 4979,
+        "breakdown": [
+          {
+            "taxCategory": "category.reduced-taxable-transfer",
+            "applicableRate": "0.08",
+            "basisAmountYen": 27060,
+            "taxYen": 2164
+          },
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 28158,
+            "taxYen": 2815
+          }
+        ]
+      },
+      "notes": "公式図の明細額。明細丸めの合計は8%が2163、10%が2814だが、S-003/S-004/S-005に従い期待値は集計後の2164/2815。"
+    },
+    {
+      "caseId": "G-ANCHOR-IN-REDUCED",
+      "provenance": "official-example",
+      "ruleIds": ["QIT-005", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-002", "S-004", "S-005"],
+      "description": "税込の軽減対象率グループを8/108で計算する公式アンカー",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-ANCHOR-IN-REDUCED",
+        "basis": "TaxInclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 29223
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 29223,
+        "taxTotalYen": 2164,
+        "breakdown": [
+          {
+            "taxCategory": "category.reduced-taxable-transfer",
+            "applicableRate": "0.08",
+            "basisAmountYen": 29223,
+            "taxYen": 2164
+          }
+        ]
+      },
+      "notes": "NTA概要（S-005）7ページの税込8%対象計29,223→2,164。式は29223×8/108。"
+    },
+    {
+      "caseId": "G-ANCHOR-IN-GENERAL",
+      "provenance": "official-example",
+      "ruleIds": ["QIT-004", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-002", "S-004", "S-005"],
+      "description": "税込の一般課税率グループを10/110で計算する公式アンカー",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-ANCHOR-IN-GENERAL",
+        "basis": "TaxInclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 30972
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 30972,
+        "taxTotalYen": 2815,
+        "breakdown": [
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 30972,
+            "taxYen": 2815
+          }
+        ]
+      },
+      "notes": "NTA概要（S-005）7ページの税込10%対象計30,972→2,815。式は30972×10/110。"
+    },
+    {
+      "caseId": "G-ANCHOR-IN-MIXED",
+      "provenance": "official-example",
+      "ruleIds": ["QIT-001", "QIT-004", "QIT-005", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-001", "S-002", "S-003", "S-005"],
+      "description": "税込8%と10%を別々に集計してから計算する公式アンカー",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-ANCHOR-IN-MIXED",
+        "basis": "TaxInclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 29223
+          },
+          {
+            "lineId": "L2",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 30972
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 60195,
+        "taxTotalYen": 4979,
+        "breakdown": [
+          {
+            "taxCategory": "category.reduced-taxable-transfer",
+            "applicableRate": "0.08",
+            "basisAmountYen": 29223,
+            "taxYen": 2164
+          },
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 30972,
+            "taxYen": 2815
+          }
+        ]
+      },
+      "notes": "NTA概要（S-005）7ページの税込8%・10%対象計を合わせた派生結果。税込請求金額は60195、税額は4979。"
+    },
+    {
+      "caseId": "G-ANCHOR-IN-LINE-ROUNDING",
+      "provenance": "official-example",
+      "ruleIds": ["QIT-001", "QIT-004", "QIT-005", "QIT-006", "QIT-008"],
+      "sourceIds": ["S-003", "S-004", "S-005"],
+      "description": "公式の明細単位丸め誤りを含む税込ケース",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-ANCHOR-IN-LINE-ROUNDING",
+        "basis": "TaxInclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 14969
+          },
+          {
+            "lineId": "L2",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 14254
+          },
+          {
+            "lineId": "L3",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 4827
+          },
+          {
+            "lineId": "L4",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 26145
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 60195,
+        "taxTotalYen": 4979,
+        "breakdown": [
+          {
+            "taxCategory": "category.reduced-taxable-transfer",
+            "applicableRate": "0.08",
+            "basisAmountYen": 29223,
+            "taxYen": 2164
+          },
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 30972,
+            "taxYen": 2815
+          }
+        ]
+      },
+      "notes": "公式図の税込明細額。明細丸めの合計は8%が2163、10%が2814だが、集計後の期待値は2164/2815。"
+    },
+    {
+      "caseId": "G-DERIVED-EX-REDUCED-UP",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-003", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-002", "S-004", "S-007"],
+      "description": "税抜8%の切上げ",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-EX-REDUCED-UP",
+        "basis": "TaxExclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 19
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundUp", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 21,
+        "taxTotalYen": 2,
+        "breakdown": [
+          {
+            "taxCategory": "category.reduced-taxable-transfer",
+            "applicableRate": "0.08",
+            "basisAmountYen": 19,
+            "taxYen": 2
+          }
+        ]
+      },
+      "notes": "S-002の税抜式19×8%=1.52をS-004で許容された切上げにした派生算術。"
+    },
+    {
+      "caseId": "G-DERIVED-EX-GENERAL-UP",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-002", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-002", "S-004", "S-007"],
+      "description": "税抜10%の切上げ（.5境界）",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-EX-GENERAL-UP",
+        "basis": "TaxExclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 28155
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundUp", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 30971,
+        "taxTotalYen": 2816,
+        "breakdown": [
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 28155,
+            "taxYen": 2816
+          }
+        ]
+      },
+      "notes": "S-002の28155×10%=2815.5を切上げる派生算術。"
+    },
+    {
+      "caseId": "G-DERIVED-EX-GENERAL-HALF-UP",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-002", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-002", "S-004", "S-007"],
+      "description": "税抜10%の四捨五入（.5境界）",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-EX-GENERAL-HALF-UP",
+        "basis": "TaxExclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 28155
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "HalfUp", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 30971,
+        "taxTotalYen": 2816,
+        "breakdown": [
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 28155,
+            "taxYen": 2816
+          }
+        ]
+      },
+      "notes": "S-004が示す四捨五入を、非負値のHalfUpとして明示した派生算術。"
+    },
+    {
+      "caseId": "G-DERIVED-EX-GENERAL-DOWN",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-002", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-002", "S-004", "S-007"],
+      "description": "税抜10%の切捨て（.5境界）",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-EX-GENERAL-DOWN",
+        "basis": "TaxExclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 28155
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 30970,
+        "taxTotalYen": 2815,
+        "breakdown": [
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 28155,
+            "taxYen": 2815
+          }
+        ]
+      },
+      "notes": "S-002の28155×10%=2815.5を切捨てる派生算術。"
+    },
+    {
+      "caseId": "G-DERIVED-IN-REDUCED-UP",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-005", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-002", "S-004", "S-007"],
+      "description": "税込8%の切上げ",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-IN-REDUCED-UP",
+        "basis": "TaxInclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 7
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundUp", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 7,
+        "taxTotalYen": 1,
+        "breakdown": [
+          {
+            "taxCategory": "category.reduced-taxable-transfer",
+            "applicableRate": "0.08",
+            "basisAmountYen": 7,
+            "taxYen": 1
+          }
+        ]
+      },
+      "notes": "S-002の税込式7×8/108=0.518...を切上げる派生算術。"
+    },
+    {
+      "caseId": "G-DERIVED-IN-REDUCED-DOWN",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-005", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-002", "S-004", "S-007"],
+      "description": "税込8%の切捨て",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-IN-REDUCED-DOWN",
+        "basis": "TaxInclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 7
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 7,
+        "taxTotalYen": 0,
+        "breakdown": [
+          {
+            "taxCategory": "category.reduced-taxable-transfer",
+            "applicableRate": "0.08",
+            "basisAmountYen": 7,
+            "taxYen": 0
+          }
+        ]
+      },
+      "notes": "S-002の税込式7×8/108=0.518...を切捨てる派生算術。"
+    },
+    {
+      "caseId": "G-DERIVED-IN-GENERAL-UP",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-004", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-002", "S-004", "S-007"],
+      "description": "税込10%の切上げ",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-IN-GENERAL-UP",
+        "basis": "TaxInclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 5
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundUp", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 5,
+        "taxTotalYen": 1,
+        "breakdown": [
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 5,
+            "taxYen": 1
+          }
+        ]
+      },
+      "notes": "S-002の税込式5×10/110=0.454...を切上げる派生算術。"
+    },
+    {
+      "caseId": "G-DERIVED-IN-GENERAL-HALF-UP",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-004", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-002", "S-004", "S-007"],
+      "description": "税込10%の四捨五入",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-IN-GENERAL-HALF-UP",
+        "basis": "TaxInclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 6
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "HalfUp", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 6,
+        "taxTotalYen": 1,
+        "breakdown": [
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 6,
+            "taxYen": 1
+          }
+        ]
+      },
+      "notes": "S-002の税込式6×10/110=0.545...を非負値のHalfUpで丸める派生算術。"
+    },
+    {
+      "caseId": "G-DERIVED-IN-GENERAL-DOWN",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-004", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-002", "S-004", "S-007"],
+      "description": "税込10%の切捨て",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-IN-GENERAL-DOWN",
+        "basis": "TaxInclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 6
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 6,
+        "taxTotalYen": 0,
+        "breakdown": [
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 6,
+            "taxYen": 0
+          }
+        ]
+      },
+      "notes": "S-002の税込式6×10/110=0.545...を切捨てる派生算術。"
+    },
+    {
+      "caseId": "G-DERIVED-EX-SAME-RATE-AGGREGATE",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-001", "QIT-002", "QIT-006", "QIT-008"],
+      "sourceIds": ["S-002", "S-003", "S-004"],
+      "description": "同一率の複数明細を集計してから丸める税抜ケース",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-EX-SAME-RATE-AGGREGATE",
+        "basis": "TaxExclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 1
+          },
+          {
+            "lineId": "L2",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 9
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 11,
+        "taxTotalYen": 1,
+        "breakdown": [
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 10,
+            "taxYen": 1
+          }
+        ]
+      },
+      "notes": "公式式からの派生。1と9を個別に丸めた0+0ではなく、合計10×10%=1を使う。"
+    },
+    {
+      "caseId": "G-DERIVED-EX-MIXED-RATE-AGGREGATE",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-001", "QIT-002", "QIT-003", "QIT-006", "QIT-008"],
+      "sourceIds": ["S-001", "S-002", "S-003", "S-007"],
+      "description": "8%と10%を別集計し、両率とも明細をまとめる税抜ケース",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-EX-MIXED-RATE-AGGREGATE",
+        "basis": "TaxExclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 12
+          },
+          {
+            "lineId": "L2",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 1
+          },
+          {
+            "lineId": "L3",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 13
+          },
+          {
+            "lineId": "L4",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 9
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 38,
+        "taxTotalYen": 3,
+        "breakdown": [
+          {
+            "taxCategory": "category.reduced-taxable-transfer",
+            "applicableRate": "0.08",
+            "basisAmountYen": 25,
+            "taxYen": 2
+          },
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 10,
+            "taxYen": 1
+          }
+        ]
+      },
+      "notes": "S-002の率別式とS-003の単位からの派生。率を混ぜず、8%は25×8%=2、10%は10×10%=1。"
+    },
+    {
+      "caseId": "G-DERIVED-IN-MIXED-RATE-AGGREGATE",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-001", "QIT-004", "QIT-005", "QIT-006", "QIT-008"],
+      "sourceIds": ["S-001", "S-002", "S-003", "S-007"],
+      "description": "8%と10%を別集計し、税込式を適用するケース",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-IN-MIXED-RATE-AGGREGATE",
+        "basis": "TaxInclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 6
+          },
+          {
+            "lineId": "L2",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 7
+          },
+          {
+            "lineId": "L3",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 5
+          },
+          {
+            "lineId": "L4",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 20
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 38,
+        "taxTotalYen": 3,
+        "breakdown": [
+          {
+            "taxCategory": "category.reduced-taxable-transfer",
+            "applicableRate": "0.08",
+            "basisAmountYen": 27,
+            "taxYen": 2
+          },
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 11,
+            "taxYen": 1
+          }
+        ]
+      },
+      "notes": "S-002の税込式。8%は27×8/108=2、10%は11×10/110=1。税込総額は入力合計38。"
+    },
+    {
+      "caseId": "G-DERIVED-ORDER-INDEPENDENT",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-001", "QIT-002", "QIT-003", "QIT-006", "QIT-009"],
+      "sourceIds": ["S-001", "S-002", "S-003", "S-006", "S-007"],
+      "description": "入力明細の順序に依存せず、安定した率別内訳を返すケース",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-ORDER-INDEPENDENT",
+        "basis": "TaxExclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 999
+          },
+          {
+            "lineId": "L2",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 777
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 1937,
+        "taxTotalYen": 161,
+        "breakdown": [
+          {
+            "taxCategory": "category.reduced-taxable-transfer",
+            "applicableRate": "0.08",
+            "basisAmountYen": 777,
+            "taxYen": 62
+          },
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 999,
+            "taxYen": 99
+          }
+        ]
+      },
+      "notes": "S-006の決定的な計算契約とS-002の率別式からの派生。出力内訳は率の昇順で比較する。"
+    },
+    {
+      "caseId": "G-DERIVED-INTEGER",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-001", "QIT-002", "QIT-003", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-001", "S-002", "S-007"],
+      "description": "両率とも未丸め税額が整数になる混在ケース",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-INTEGER",
+        "basis": "TaxExclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 12500
+          },
+          {
+            "lineId": "L2",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 10000
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundDown", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 24500,
+        "taxTotalYen": 2000,
+        "breakdown": [
+          {
+            "taxCategory": "category.reduced-taxable-transfer",
+            "applicableRate": "0.08",
+            "basisAmountYen": 12500,
+            "taxYen": 1000
+          },
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 10000,
+            "taxYen": 1000
+          }
+        ]
+      },
+      "notes": "S-002とS-007の率を適用した派生算術。率別集計後の税額が整数でも、Rule Setと丸め方は明示する。"
+    },
+    {
+      "caseId": "G-DERIVED-MIXED-ROUND-UP",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-001", "QIT-002", "QIT-003", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-001", "S-002", "S-004", "S-007"],
+      "description": "同一Invoiceで8%・10%を混在させ、両率を切上げるケース",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-MIXED-ROUND-UP",
+        "basis": "TaxExclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 15
+          },
+          {
+            "lineId": "L2",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 19
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "RoundUp", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 38,
+        "taxTotalYen": 4,
+        "breakdown": [
+          {
+            "taxCategory": "category.reduced-taxable-transfer",
+            "applicableRate": "0.08",
+            "basisAmountYen": 19,
+            "taxYen": 2
+          },
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 15,
+            "taxYen": 2
+          }
+        ]
+      },
+      "notes": "S-002の率別式とS-004の切上げ。率を先に合算せず、1.52と1.5を各率グループで処理する。"
+    },
+    {
+      "caseId": "G-DERIVED-MIXED-IN-HALF-UP",
+      "provenance": "rule-derived",
+      "ruleIds": ["QIT-001", "QIT-004", "QIT-005", "QIT-006", "QIT-007"],
+      "sourceIds": ["S-001", "S-002", "S-004", "S-007"],
+      "description": "同一Invoiceで8%・10%を混在させ、税込式をHalfUpで処理するケース",
+      "ruleSet": {
+        "id": "JP-QIT-2023-10-v1",
+        "effectiveFrom": "2023-10-01",
+        "rateByTaxCategory": [
+          {"taxCategory": "category.general-taxable-transfer", "applicableRate": "0.10"},
+          {"taxCategory": "category.reduced-taxable-transfer", "applicableRate": "0.08"}
+        ]
+      },
+      "input": {
+        "invoiceId": "G-DERIVED-MIXED-IN-HALF-UP",
+        "basis": "TaxInclusive",
+        "lines": [
+          {
+            "lineId": "L1",
+            "taxCategory": "category.reduced-taxable-transfer",
+            "businessMeaning": "caller-classified reduced-rate taxable transfer",
+            "amountYen": 7
+          },
+          {
+            "lineId": "L2",
+            "taxCategory": "category.general-taxable-transfer",
+            "businessMeaning": "caller-classified taxable transfer outside reduced-rate category",
+            "amountYen": 6
+          }
+        ]
+      },
+      "roundingPolicy": {"mode": "HalfUp", "unit": "JPY"},
+      "expected": {
+        "invoiceTotalYen": 13,
+        "taxTotalYen": 2,
+        "breakdown": [
+          {
+            "taxCategory": "category.reduced-taxable-transfer",
+            "applicableRate": "0.08",
+            "basisAmountYen": 7,
+            "taxYen": 1
+          },
+          {
+            "taxCategory": "category.general-taxable-transfer",
+            "applicableRate": "0.10",
+            "basisAmountYen": 6,
+            "taxYen": 1
+          }
+        ]
+      },
+      "notes": "S-002の8/108・10/110とS-004の四捨五入を明示した派生算術。税込総額は入力合計13。"
+    }
+  ]
+}
