@@ -40,6 +40,12 @@ InvoiceTaxRequest {
 
 TaxCategoryは10%や8%を意味するenum値として定義しない。BusinessMeaningとCategoryは呼出し側が既に判断したものを受け取り、適用率はRule Setのmappingからだけ解決する。
 
+### G1 valid input constraint
+
+G1 Candidateでは、一つのRule Set内で、一つのApplicableRateに対応できるTaxCategoryは一つだけとする。異なる複数のTaxCategoryが同じApplicableRateへ解決されるRule Setは、Rule Set validationでエラーにする。同じTaxCategoryの複数明細は有効であり、ApplicableRate単位で集計する。
+
+これはRateBreakdownが単一のTaxCategoryを持つというG1の表現上の制約であり、TaxCategoryごとに計算・丸めるという意味ではない。税額計算と丸めの単位は引き続きApplicableRate単位とする。同一率に複数Categoryが必要になった場合は、将来TaxCategories listまたは別metadataを持つ内訳へ再設計する。
+
 ## 操作
 
 ~~~
@@ -49,12 +55,12 @@ InvoiceTaxResult Calculate(InvoiceTaxRequest request)
 Calculateは副作用のない単一操作とする。内部の最小手順は次のとおり。
 
 1. InvoiceId、Basis、Rule Set ID、EffectiveFrom、明示されたRoundingPolicy、各LineのCategory/BusinessMeaningを検証する。
-2. 各LineのTaxCategoryをrequest.RuleSetからApplicableRateへ解決する。対応がなければエラーにする。
+2. Rule Setを検証する。同一ApplicableRateに複数TaxCategoryがあればエラーにする。各LineのTaxCategoryをrequest.RuleSetからApplicableRateへ解決し、対応がなければエラーにする。
 3. ApplicableRateごとにAmountYenを合計する。8%と10%など異なる率の額を先に合算しない。
 4. TaxExclusiveなら basisAmount × rate、TaxInclusiveなら basisAmount × rate ÷（1＋rate）を計算する。
 5. 各率グループの未丸め税額へ、request.RoundingPolicy.Modeを1回だけ適用する。
 6. 結果の税額合計を率グループ税額の合計として返し、同じ率グループの明細単位丸め税額は合算しない。
-7. 出力内訳は率、Category、集計したBasisAmountYen、TaxYenを含め、率とCategoryの安定した順序で返す。
+7. 出力内訳は率、Category、集計したBasisAmountYen、TaxYenを含め、率とCategoryの安定した順序で返す。G1のvalid input constraintにより、各率の内訳Categoryは一意である。
 
 ## Result
 
@@ -85,8 +91,9 @@ RateBreakdown {
 - Libraryは商品・役務の法的な軽減税率該当性を判断しない。
 - 同じRule Set、Input、RoundingPolicyの結果は決定的である。
 - 入力のrate mappingを無視した固定のCategory-to-rate定数を設けない。
+- 同一ApplicableRateに複数TaxCategoryを対応させるRule Setを受け付けない。これはRateBreakdownの一意性を保つG1 validationである。
 - 小さな一つのCalculatorと値の型だけで足りる。汎用Rule Engine、DSL、複雑なinterface階層、DI containerは作らない。
 
 ## G1で扱わないAPI
 
-申告税額、仕入税額控除、返品・値引きの符号処理、外貨、小数円、登録番号照合、商品分類、PDF/XML/UI/DBは含めない。
+申告税額、仕入税額控除、返品・値引きの符号処理、外貨、小数円、登録番号照合、商品分類、同一率複数Categoryの将来内訳、PDF/XML/UI/DBは含めない。

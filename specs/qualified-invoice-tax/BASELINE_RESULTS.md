@@ -14,6 +14,8 @@
 
 Protocol、Prompt、Corpusを固定してから測定した。Promptには期待値、Golden case、SOURCES、RULES、API Sketchを含めていない。採点用CorpusとHarnessはAgent作業ディレクトリの外 `/srv/dev/scratch/amane-jp-business-g1-baseline/harness/` に置いた。
 
+測定後、再現可能性をレビューできるよう、保存済みPromptを `BASELINE_PROMPT.md` として公開した。公開ファイルは測定に使ったPromptとbyte-identicalであり、上記Prompt SHA-256と一致する。これは測定後の証拠公開であり、測定前にFreezeしたProtocol、Corpus、Baseline数値を変更するものではない。
+
 ## Corpus
 
 - Total: 24
@@ -37,6 +39,12 @@ Protocol、Prompt、Corpusを固定してから測定した。Promptには期待
 | Claude Code | `2.1.236` | PASS | 24/24 | 100.00% | PASS | 0 | Strong |
 
 Claude Codeの実行中はAgent側のdotnet確認が権限確認で止まったため、Coordinatorが同じ生成物を変更せず独立buildした。CodexもClaudeも、その後の再生成・修正依頼・失敗caseの提示・再採点は行っていない。実装サイズは参考値として、CodexがC# 1ファイル/558行、ClaudeがC# 8ファイル/614行である。
+
+### Baselineの限界
+
+今回Agentへ渡したPromptには、すでに `tax-exclusive formula`、`tax-inclusive formula`、`group before rounding`、`rounding modes`、`Rule Set mapping`、`determinism requirement` が整理済みの契約として含まれていた。したがって、この実験が示すのは、**正しい契約がすでに整理されていれば、その契約から実装コードを生成することは現在のCoding Agentにとって容易だった**ということである。
+
+これは、Coding Agentが税務上の問題だけを与えられて、公的一次資料を探索し、正しいNormative Sourceを選び、法令・通達を解釈し、同じ仕様へ自力で到達できることまでは証明しない。Baselineは仕様発見能力の測定ではなく、固定済み契約からの実装再現性の測定である。
 
 ### Material violation audit
 
@@ -65,9 +73,11 @@ Claude Codeの実行中はAgent側のdotnet確認が権限確認で止まった�
 - Repository additions: `specs/qualified-invoice-tax/` 配下のみ
 - Product source: not added
 - Product tests/projects: not added
+- `BASELINE_PROMPT.md`: 測定後にbyte-identicalな証拠として追加
 - `.csproj` / `.sln` / `.slnx` / NuGet / Core / Rule Engine / DSL: not added
 - CI / release / other package: not added
 - `DEVELOPMENT_PRINCIPLES.md`: unchanged
+- `BASELINE_PROTOCOL.md` / `golden/cases.json` / `SOURCES.md`: unchanged
 - Push / PR / merge: not performed
 
 Coordinatorの採点用実装・HarnessはRepositoryへ追加していない。

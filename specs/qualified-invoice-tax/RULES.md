@@ -30,18 +30,30 @@ Tax Category は率そのものではない。たとえば、現在の例示Rule
 
 ## Rule一覧
 
-| Rule ID | 要約 | Source IDs |
-| --- | --- | --- |
-| QIT-001 | 計算前に適用率ごとに集計する | S-001, S-002, S-003, S-005, S-006 |
-| QIT-002 | 税抜・現行例示の一般課税Category | S-001, S-002, S-005, S-007 |
-| QIT-003 | 税抜・現行例示の軽減対象Category | S-001, S-002, S-005, S-007 |
-| QIT-004 | 税込・現行例示の一般課税Category | S-001, S-002, S-005, S-007 |
-| QIT-005 | 税込・現行例示の軽減対象Category | S-001, S-002, S-005, S-007 |
-| QIT-006 | Invoice×率グループで丸めを1回だけ行う | S-002, S-003, S-004, S-005 |
-| QIT-007 | 丸め方を明示する | S-002, S-004 |
-| QIT-008 | 明細単位丸め税額の合計をInvoice税額にしない | S-003, S-004, S-005 |
-| QIT-009 | Rule Setを明示し、同じ入力を再現可能にする | S-001, S-002, S-006 |
-| QIT-010 | 軽減税率の法的分類をLibraryが自動判断しない | S-001, S-003, S-005, S-006 |
+| Rule ID | Kind | 要約 | Source IDs |
+| --- | --- | --- | --- |
+| QIT-001 | Domain Rule | 計算前に適用率ごとに集計する | S-001, S-002, S-003, S-005, S-006 |
+| QIT-002 | Domain Rule | 税抜・現行例示の一般課税Category | S-001, S-002, S-005, S-007 |
+| QIT-003 | Domain Rule | 税抜・現行例示の軽減対象Category | S-001, S-002, S-005, S-007 |
+| QIT-004 | Domain Rule | 税込・現行例示の一般課税Category | S-001, S-002, S-005, S-007 |
+| QIT-005 | Domain Rule | 税込・現行例示の軽減対象Category | S-001, S-002, S-005, S-007 |
+| QIT-006 | Domain Rule | Invoice×率グループで丸めを1回だけ行う | S-002, S-003, S-004, S-005 |
+| QIT-007 | Design Invariant | 丸め方を明示する | S-002, S-004 |
+| QIT-008 | Domain Rule | 明細単位丸め税額の合計をInvoice税額にしない | S-003, S-004, S-005 |
+| QIT-009 | Design Invariant | Rule Setを明示し、同じ入力を再現可能にする | S-001, S-002, S-006 |
+| QIT-010 | Scope Guard | 軽減税率の法的分類をLibraryが自動判断しない | S-001, S-003, S-005, S-006 |
+
+### Kindの意味
+
+- **Domain Rule**: 法令・通達・公式資料から、今回の税額算術として採用した業務上の規則。
+- **Design Invariant**: 業務規則を再現可能なAPIへ落とすために、Candidateが追加したソフトウェア契約。法律がこのSoftware Architectureを直接要求するという意味ではない。
+- **Scope Guard**: 法的分類や対象範囲をLibraryが越境しないための境界条件。
+
+### G1 valid input constraint
+
+G1 Candidateでは、一つのRule Set内で、一つのApplicableRateに対応できるTaxCategoryは一つだけとする。異なる複数のTaxCategoryが同じApplicableRateへ解決されるRule Setは、Rule Set validationでエラーにする。同じTaxCategoryの複数明細は有効であり、税額計算と丸めの単位は引き続きApplicableRate単位とする。
+
+この制約は、G1のRateBreakdownが単一TaxCategoryを持つことによる表現上のvalidationである。TaxCategoryごとに税額を計算・丸める変更ではない。同一率に複数Categoryが必要になった場合は、TaxCategories listまたは別metadataを持つ内訳を将来改めて設計する。
 
 ## Rule details
 
@@ -52,7 +64,7 @@ Tax Category は率そのものではない。たとえば、現在の例示Rule
 - Input: Invoiceの明細、各明細の caller-supplied Tax Category/Business Meaning、明示されたRule Set、Input basis。
 - Expected behavior: CategoryからRule Setで率を解決し、同じ率の明細を先に集計してから税額を計算する。8%と10%の総額を先に混ぜない。
 - Interpretation: 法57条の4第1項第4号・第5号、令70条の10、基本通達1-8-15の「税率の異なるごとに区分して合計」を計算契約へ落とし込む。
-- Known ambiguity: 同じ率に複数のBusiness Meaning/Categoryが存在する将来の内訳表示はG1では定義しない。現在のG1 Rule Setは1率につき1 Categoryを例示する。
+- Known ambiguity: 同じ率に複数のBusiness Meaning/Categoryを持たせる将来の内訳表示はG1のvalid input外とする。Rule Set validationで拒否し、将来対応時にTaxCategories listまたは別metadataを設計する。
 
 ### QIT-002 — 税抜・一般課税Category計算
 
@@ -105,7 +117,7 @@ Tax Category は率そのものではない。たとえば、現在の例示Rule
 - Normative/Interpretive Source IDs: S-002, S-004
 - Input: RoundDown、RoundUp、またはHalfUpと、1円単位の明示指定。
 - Expected behavior: 指定モードを必須とし、指定がない場合に暗黙の既定値を選ばない。Corpusでは非負値のRoundDown、RoundUp、HalfUpを使う。
-- Interpretation: 令70条の10は1円未満を処理するとし、No.6371は切上げ、切捨て、四捨五入等を任意の方法として説明する。本APIでは任意性をhidden defaultにせず入力へ出す。
+- Interpretation: 令70条の10は1円未満を処理するとし、No.6371は切上げ、切捨て、四捨五入等を任意の方法として説明する。どの方法を選ぶかを利用者へ明示させること、未指定時のdefaultを置かないことは、本CandidateのDesign Invariantである。法律がこのSoftware Architectureを要求するという意味ではない。
 - Known ambiguity: 負数の返還・値引きに対する符号付き丸めや、HalfUpの国際的な名称差はG1の非負Inputから除外する。
 
 ### QIT-008 — 明細単位丸め税額合計をInvoice税額としない
@@ -138,7 +150,7 @@ Tax Category は率そのものではない。たとえば、現在の例示Rule
 ## 未解決事項
 
 1. 現行以外の税率、経過措置、制度改正のRule Setは未定義である。
-2. 同一適用率に複数Categoryがある場合の内訳単位は未定義である。G1では率別計算を優先する。
+2. 同一適用率に複数Categoryを対応させる内訳はG1のvalid input外とし、Rule Set validationで拒否する。将来対応時にTaxCategories listまたは別metadataを含む内訳表現を設計する。
 3. Invoice境界を何で決めるかは呼出し側の責務である。
 4. 負数の返品・値引き、外貨、小数円、地方消費税を別欄に分ける結果は対象外である。
 5. このCorpusでの税額は適格請求書に記載する消費税額等であり、課税期間の申告税額や仕入税額控除額ではない。
